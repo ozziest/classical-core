@@ -1,0 +1,33 @@
+{
+    "name": "ozziest/core",
+    "description": "PHP simple framework core",
+    "authors": [
+        {
+            "name": "Özgür Adem Işıklı",
+            "email": "i.ozguradem@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "illuminate/database": "5.*",
+        "symfony/routing": "3.*",
+        "symfony/http-foundation": "3.*",
+        "philo/laravel-blade": "3.*",
+        "filp/whoops": "^2.1",
+        "ozziest/windrider": "2.*",
+        "nette/mail": "^2.3",
+        "monolog/monolog": "^1.18"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.3.*",
+        "mockery/mockery": "^0.9.5"
+    },
+    "autoload": {
+        "psr-0": {
+            "Ozziest\\Core": "src"
+        }
+    },
+    "scripts": {
+        "phploc": "phploc --log-xml phploc.xml --progress src"
+    }
+}
