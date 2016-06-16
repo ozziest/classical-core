@@ -14,14 +14,11 @@ use Philo\Blade\Blade;
 use Ozziest\Windrider\ValidationException;
 use Ozziest\Windrider\Windrider;
 use Ozziest\Core\Exceptions\UserException;
-use Exception, Lifecycle, Router, DI;
-
+use Exception, Router;
 use Ozziest\Core\HTTP\Response;
 use Ozziest\Core\HTTP\Request;
 use Ozziest\Core\Data\DB;
-use Ozziest\Core\Data\Session;
 use Ozziest\Core\System\Logger;
-use Ozziest\Core\System\DIManager;
 
 class Bootstrap {
 
@@ -40,16 +37,15 @@ class Bootstrap {
     {
         try 
         {
+            session_start();
             class_alias('\Ozziest\Core\HTTP\Router', 'Router');
-            class_alias('\Ozziest\Core\System\DI', 'DI');
-            class_alias('\Ozziest\Core\Data\Lifecycle', 'Lifecycle');
-            class_alias('\Ozziest\Core\Data\Statics', 'Statics');
+            class_alias('\Ozziest\Core\Data\Session', 'Session');
+            class_alias('\Ozziest\Core\Data\Redirect', 'Redirect');
             $this->initLogger();
             $this->initSetups();
             $this->initConfigurations();
             $this->initRequest();
             $this->initResponse();
-            $this->initDependencies();
             $this->initDatabase();
             $this->initErrorHandler();
             $this->initApplicationLayers();
@@ -81,16 +77,6 @@ class Bootstrap {
             $this->showError($exception, 500);
         }        
         
-    }
-    
-    /**
-     * DI Manager is being set!
-     * 
-     * @return null
-     */
-    private function initDependencies()
-    {
-        DI::setManager(new DIManager());
     }
     
     /**
@@ -210,6 +196,11 @@ class Bootstrap {
         );
     }
     
+    public function redirectExtension()
+    {
+        var_dump('redirectExtension');
+    }
+    
     /**
      * Initializing the request object
      * 
@@ -250,11 +241,8 @@ class Bootstrap {
             $this->callMiddleware($middleware);
         }
         
-        // Session bilgiriyle yeni bir kullanıcı oluştulur.
-        $session = new Session(Lifecycle::get('user'));
-
         // Controller oluşturulur.
-        $controller = new $parameters['controller']($session, $this->db, $this->logger);
+        $controller = new $parameters['controller']($this->db, $this->logger);
         $this->request->parameters = $parameters;
         
         // Bağımlılık enjeksionları gerçekleştirilir.
