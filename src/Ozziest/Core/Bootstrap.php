@@ -14,7 +14,7 @@ use Philo\Blade\Blade;
 use Ozziest\Windrider\ValidationException;
 use Ozziest\Windrider\Windrider;
 use Ozziest\Core\Exceptions\UserException;
-use Exception, Router;
+use Exception, Router, Session, Form;
 use Ozziest\Core\HTTP\Response;
 use Ozziest\Core\HTTP\Request;
 use Ozziest\Core\Data\DB;
@@ -40,6 +40,7 @@ class Bootstrap {
             session_start();
             class_alias('\Ozziest\Core\HTTP\Router', 'Router');
             class_alias('\Ozziest\Core\Data\Session', 'Session');
+            class_alias('\Ozziest\Core\Data\Form', 'Form');
             class_alias('\Ozziest\Core\Data\Redirect', 'Redirect');
             $this->initLogger();
             $this->initSetups();
@@ -211,7 +212,8 @@ class Bootstrap {
         $this->request = SymfonyRequest::createFromGlobals();
         $context = new RequestContext();
         $context->fromRequest($this->request);
-        $this->matcher = new UrlMatcher(Router::getCollection(), $context);        
+        $this->matcher = new UrlMatcher(Router::getCollection(), $context);
+        Form::setRequestData($this->request->request->all());
     }
     
     /**
@@ -255,6 +257,8 @@ class Bootstrap {
         $this->db->transaction();
         $content = call_user_func_array([$controller, $parameters['method']], $arguments);
         $this->db->commit();
+        
+        Form::clear();
     }
     
     /**
