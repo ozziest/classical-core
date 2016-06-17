@@ -1,5 +1,8 @@
 <?php namespace Ozziest\Core\Data;
 
+use Ozziest\Core\HTTP\IRequest;
+use Ozziest\Windrider\Windrider;
+
 class Form {
     
     public static function setRequestData($data)
@@ -15,7 +18,7 @@ class Form {
             return '';
         }
         
-        if (isset($data[$key]) === false)
+        if (is_array($data) === false || isset($data[$key]) === false)
         {
             return '';
         }
@@ -26,6 +29,23 @@ class Form {
     public static function clear()
     {
         Session::set('request_data', null);
+    }
+    
+    public static function validate(IRequest $request, $rules)
+    {
+        Windrider::runOrFail($request->all(), $rules);
+    }
+    
+    public static function hasError()
+    {
+        return Session::get('validation_errors') !== null;
+    }
+    
+    public static function getErrors()
+    {
+        $errors = Session::get('validation_errors');
+        Session::set('validation_errors', null);
+        return $errors;
     }
     
 }

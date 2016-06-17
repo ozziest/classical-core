@@ -14,7 +14,7 @@ use Philo\Blade\Blade;
 use Ozziest\Windrider\ValidationException;
 use Ozziest\Windrider\Windrider;
 use Ozziest\Core\Exceptions\UserException;
-use Exception, Router, Session, Form;
+use Exception, Router, Session, Form, Redirect;
 use Ozziest\Core\HTTP\Response;
 use Ozziest\Core\HTTP\Request;
 use Ozziest\Core\Data\DB;
@@ -37,7 +37,6 @@ class Bootstrap {
     {
         try 
         {
-            session_start();
             class_alias('\Ozziest\Core\HTTP\Router', 'Router');
             class_alias('\Ozziest\Core\Data\Session', 'Session');
             class_alias('\Ozziest\Core\Data\Form', 'Form');
@@ -51,19 +50,29 @@ class Bootstrap {
             $this->initErrorHandler();
             $this->initApplicationLayers();
             $this->callAppcalition();
+            if ($this->request->getMethod() !== "POST")
+            {
+                Session::set('last_page', $this->request->getPathInfo());
+            }
+            Form::clear();
         }
         catch (ModelNotFoundException $exception)
         {
-            $this->showError($exception, 400, "Record not found!");
+            $this->db->rollBack();
+            Session::set('validation_errors', ["Record not found!"]);
+            Redirect::to(Session::get('last_page'));
         }
         catch (ValidationException $exception) 
         {
             $this->db->rollBack();
-            $this->response->json(['message' => Windrider::getErrors()], 406);
+            Session::set('validation_errors', Windrider::getErrors());
+            Redirect::to(Session::get('last_page'));
         }
         catch (UserException $exception)
         {
-            $this->showError($exception, $exception->getCode());
+            $this->db->rollBack();
+            Session::set('validation_errors', [$exception->getMessage()]);
+            Redirect::to(Session::get('last_page'));
         }
         catch (MethodNotAllowedException $exception) 
         {
@@ -118,21 +127,11 @@ class Bootstrap {
             $message = $exception->getMessage();
         }
         
-        if ($this->request !== null) 
-        {
-            $accept = AcceptHeader::fromString($this->request->headers->get('Accept'));
-            if ($accept->has('application/json')) 
-            {
-                return $this->response->json(['message' => $message], $status);
-            }
-        }
-        
         $this->logger->exception($exception);
         
-        if ($this->response !== null) {
-            $this->response->view($status, ['exception' => $exception], $status);
-        }
-
+        Session::set('validation_errors', [$message]);
+        Redirect::to(Session::get('last_page'));
+        
     }
     
     /**
@@ -213,7 +212,10 @@ class Bootstrap {
         $context = new RequestContext();
         $context->fromRequest($this->request);
         $this->matcher = new UrlMatcher(Router::getCollection(), $context);
-        Form::setRequestData($this->request->request->all());
+        if ($this->request->getMethod() === "POST")
+        {
+            Form::setRequestData($this->request->request->all());
+        }
     }
     
     /**
@@ -257,8 +259,6 @@ class Bootstrap {
         $this->db->transaction();
         $content = call_user_func_array([$controller, $parameters['method']], $arguments);
         $this->db->commit();
-        
-        Form::clear();
     }
     
     /**
