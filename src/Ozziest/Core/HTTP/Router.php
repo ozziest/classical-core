@@ -8,14 +8,14 @@ class Router implements IRouter {
     private static $parentNamespace = "";
     private static $collection;
     private static $currentMiddlewares = [];
-    
+
     /**
      * This method sets the controller namespace
-     * 
+     *
      * @param  string   $parentNamespace
      * @return null
      */
-    public function setNamespace($parentNamespace)
+    public static function setNamespace($parentNamespace)
     {
         self::createFirst();
         self::$parentNamespace = $parentNamespace;
@@ -23,21 +23,21 @@ class Router implements IRouter {
 
     /**
      * This method define a route
-     * 
+     *
      * @param  string   $url
      * @param  string   $controller
      * @param  string   $action
      * @param  string   $method
      * @return null
      */
-    public function any($url, $controller, $action, $method = 'GET')
+    public static function any($url, $controller, $action, $method = 'GET')
     {
         self::createFirst();
         $controller = self::$parentNamespace."\\".$controller;
         self::$collection->add(
             str_replace('\\', '.', $controller).'.'.$action, // name of the route
-            new Route( 
-                $url, 
+            new Route(
+                $url,
                 ['controller' => $controller, 'method' => $action, 'middlewares' => self::$currentMiddlewares],
                 [], // requirements
                 [], // options
@@ -50,65 +50,65 @@ class Router implements IRouter {
 
     /**
      * This method define a GET route
-     * 
+     *
      * @param  string   $url
      * @param  string   $controller
      * @param  string   $action
      * @return null
      */
-    public function get($url, $controller, $action)
+    public static function get($url, $controller, $action)
     {
         self::any($url, $controller, $action);
     }
 
     /**
      * This method define a POST route
-     * 
+     *
      * @param  string   $url
      * @param  string   $controller
      * @param  string   $action
      * @return null
      */
-    public function post($url, $controller, $action)
+    public static function post($url, $controller, $action)
     {
         self::any($url, $controller, $action, 'POST');
     }
 
     /**
      * This method returns the route collection
-     * 
+     *
      * @return Symfony\Component\Routing\RouteCollection
      */
-    public function getCollection()
+    public static function getCollection()
     {
         self::createFirst();
         return self::$collection;
     }
-    
+
     /**
-     * This method defines a middleware 
-     * 
+     * This method defines a middleware
+     *
      * @param  string       $options
      * @param  function     $function
      * @return null
      */
-    public function middleware($options, $function)
+    public static function middleware($options, $function)
     {
         self::createFirst();
-        
-        if (!is_array($options)) 
+
+        if (!is_array($options))
         {
             $options = [$options];
         }
-        
+
         self::$currentMiddlewares = $options;
         $function();
         self::$currentMiddlewares = [];
     }
-    
+
     /**
      * This method checks the collection was defined or not
-     * 
+     *
      * @return null
      */
     private static function createFirst()
