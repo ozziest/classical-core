@@ -1,11 +1,12 @@
 <?php namespace Ozziest\Core\Data;
 
 class Redirect {
-    
-    public static function success($db, $route)
+
+    private static $db;
+
+    public static function setDB($db)
     {
-        $db->commit();
-        self::to($route);
+        self::$db = $db;
     }
 
     public static function to($route)
@@ -14,8 +15,9 @@ class Redirect {
         {
             $route = substr($route, 1);
         }
+        self::$db->commit();
         header("Location: /".$route);
-        die();        
+        die();
     }
-    
+
 }

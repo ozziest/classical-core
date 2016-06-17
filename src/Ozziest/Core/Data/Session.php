@@ -6,7 +6,7 @@ class Session {
     {
         return self::get('is_logged') !== null;
     }
-    
+
     public static function setUser($user)
     {
         self::set('the_user_id', $user->id);
@@ -14,20 +14,35 @@ class Session {
         self::set('the_user_name', $user->first_name.' '.$user->last_name);
         self::set('is_logged', true);
     }
-    
+
+    public static function id()
+    {
+        return self::get('the_user_id');
+    }
+
+    public static function name()
+    {
+        return self::get('the_user_name');
+    }
+
+    public static function email()
+    {
+        return self::get('the_user_email');
+    }
+
     public static function clearUser()
     {
         self::set('the_user_id', null);
         self::set('the_user_email', null);
         self::set('the_user_name', null);
         self::set('is_logged', null);
-    }    
-    
+    }
+
     public static function set($key, $value)
     {
         $_SESSION[$key] = $value;
     }
-    
+
     public static function get($key, $default = null)
     {
         if (isset($_SESSION[$key]))
@@ -36,5 +51,5 @@ class Session {
         }
         return $default;
     }
-    
+
 }

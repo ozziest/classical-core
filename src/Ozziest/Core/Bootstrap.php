@@ -27,15 +27,15 @@ class Bootstrap {
     private $db;
     private $matcher;
     private $logger;
-    
+
     /**
      * Bootstrapping framework
-     * 
+     *
      * @return null
      */
     public function bootstrap()
     {
-        try 
+        try
         {
             class_alias('\Ozziest\Core\HTTP\Router', 'Router');
             class_alias('\Ozziest\Core\Data\Session', 'Session');
@@ -62,7 +62,7 @@ class Bootstrap {
             Session::set('validation_errors', ["Record not found!"]);
             Redirect::to(Session::get('last_page'));
         }
-        catch (ValidationException $exception) 
+        catch (ValidationException $exception)
         {
             $this->db->rollBack();
             Session::set('validation_errors', Windrider::getErrors());
@@ -74,7 +74,7 @@ class Bootstrap {
             Session::set('validation_errors', [$exception->getMessage()]);
             Redirect::to(Session::get('last_page'));
         }
-        catch (MethodNotAllowedException $exception) 
+        catch (MethodNotAllowedException $exception)
         {
             $this->showError($exception, 404, "Method not found!");
         }
@@ -85,23 +85,23 @@ class Bootstrap {
         catch (Exception $exception)
         {
             $this->showError($exception, 500);
-        }        
-        
+        }
+
     }
-    
+
     /**
      * Initializing Logger class.
-     * 
+     *
      * @return null
      */
     private function initLogger()
     {
         $this->logger = new Logger(new MonoLogger('sorucevap'));
     }
-    
+
     /**
      * Showing error
-     * 
+     *
      * @param  Exception $exception
      * @param  integer   $status
      * @param  string    $message
@@ -119,25 +119,25 @@ class Bootstrap {
         {
             $status = 400;
         }
-    
+
         $this->failOnProduction($exception);
-        
+
         if ($message === null)
         {
             $message = $exception->getMessage();
         }
-        
+
         $this->logger->exception($exception);
-        
+
         Session::set('validation_errors', [$message]);
         Redirect::to(Session::get('last_page'));
-        
+
     }
-    
+
     /**
-     * This method checks the environment is production or not. 
+     * This method checks the environment is production or not.
      * If the environment is not production, throwing the exception
-     * 
+     *
      * @param  Exception $exception
      * @return null
      */
@@ -147,10 +147,10 @@ class Bootstrap {
             throw $exception;
         }
     }
-    
+
     /**
      * Initializing application layers
-     * 
+     *
      * @return null
      */
     private function initApplicationLayers()
@@ -158,10 +158,10 @@ class Bootstrap {
         require_once ROOT.'App/bootstrap.php';
         require_once ROOT.'App/routes.php';
     }
-    
+
     /**
-     * Initializing error handler 
-     * 
+     * Initializing error handler
+     *
      * @return null
      */
     private function initErrorHandler()
@@ -170,40 +170,41 @@ class Bootstrap {
         $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
         $whoops->register();
     }
-    
+
     /**
-     * Initializing the database 
-     * 
+     * Initializing the database
+     *
      * @return null
      */
     private function initDatabase()
     {
         $this->db = new DB(new Capsule());
         $this->db->connect();
+        Redirect::setDB($this->db);
     }
-    
+
     /**
-     * Initializing the response object 
-     * 
+     * Initializing the response object
+     *
      * @return null
      */
     private function initResponse()
     {
         $this->response = new Response(
-            $this->request, 
+            $this->request,
             new SymfonyResponse(),
             new Blade(ROOT.'resource/views', ROOT.'resource/cache')
         );
     }
-    
+
     public function redirectExtension()
     {
         var_dump('redirectExtension');
     }
-    
+
     /**
      * Initializing the request object
-     * 
+     *
      * @return null
      */
     private function initRequest()
@@ -217,10 +218,10 @@ class Bootstrap {
             Form::setRequestData($this->request->request->all());
         }
     }
-    
+
     /**
      * Initializing common setups
-     * 
+     *
      * @return null
      */
     private function initSetups()
@@ -230,11 +231,11 @@ class Bootstrap {
     }
 
     /**
-     * Calling the application controller with request object and routing 
+     * Calling the application controller with request object and routing
      * arguments.
-     * 
+     *
      * @return null
-     */ 
+     */
     private function callAppcalition()
     {
         // Controller çalıştırılır
@@ -244,11 +245,11 @@ class Bootstrap {
         {
             $this->callMiddleware($middleware);
         }
-        
+
         // Controller oluşturulur.
         $controller = new $parameters['controller']($this->db, $this->logger);
         $this->request->parameters = $parameters;
-        
+
         // Bağımlılık enjeksionları gerçekleştirilir.
         $arguments = [
             new Request($this->request),
@@ -260,17 +261,17 @@ class Bootstrap {
         $content = call_user_func_array([$controller, $parameters['method']], $arguments);
         $this->db->commit();
     }
-    
+
     /**
      * This method calls the middleware layers
-     * 
+     *
      * @param  string   $name
      * @return null
      */
     private function callMiddleware($name)
     {
         $name = "\App\Middlewares\\".$name;
-        if (!class_exists($name)) 
+        if (!class_exists($name))
         {
             throw new Exception("Middleware class not found: ".$name);
         }
@@ -280,19 +281,19 @@ class Bootstrap {
 
     /**
      * This method loads the configuration file
-     * 
+     *
      * @return null
      */
     private function initConfigurations()
     {
         $configurations = json_decode(file_get_contents(ROOT.'.env.config.json'));
-        
+
         if ($configurations === NULL)
         {
             throw new Exception("Configuration file is not correct!");
         }
-        
-        foreach ($configurations as $key => $value) 
+
+        foreach ($configurations as $key => $value)
         {
             putenv("$key=$value");
         }
