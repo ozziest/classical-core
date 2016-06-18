@@ -65,7 +65,7 @@ class Bootstrap {
         catch (ValidationException $exception)
         {
             $this->db->rollBack();
-            Session::set('validation_errors', Windrider::getErrors());
+            Session::set(Windrider::getPrefix().'validation_errors', Windrider::getErrors());
             Redirect::to(Session::get('last_page'));
         }
         catch (UserException $exception)
