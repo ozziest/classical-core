@@ -17,6 +17,11 @@ class DateHelper {
         return $now->format('Y-m-d H:i:s');
     }
 
+    public static function justDate($date)
+    {
+        return substr($date, 0, 10);
+    }
+
     public static function toHuman($date)
     {
         $date = new DateTime($date);
