@@ -12,6 +12,7 @@ class Session {
         self::set('the_user_id', $user->id);
         self::set('the_user_email', $user->email);
         self::set('the_user_name', $user->first_name.' '.$user->last_name);
+        self::set('the_user_slug', $user->slug);
         self::set('is_logged', true);
     }
 
@@ -28,6 +29,11 @@ class Session {
     public static function email()
     {
         return self::get('the_user_email');
+    }
+
+    public static function slug()
+    {
+        return self::get('the_user_slug');
     }
 
     public static function clearUser()
