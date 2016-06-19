@@ -14,6 +14,7 @@ use Philo\Blade\Blade;
 use Ozziest\Windrider\ValidationException;
 use Ozziest\Windrider\Windrider;
 use Ozziest\Core\Exceptions\UserException;
+use Ozziest\Core\Exceptions\HTTPException;
 use Exception, Router, Session, Form, Redirect;
 use Ozziest\Core\HTTP\Response;
 use Ozziest\Core\HTTP\Request;
@@ -67,6 +68,12 @@ class Bootstrap {
             $this->db->rollBack();
             Session::set(Windrider::getPrefix().'validation_errors', Windrider::getErrors());
             Redirect::to(Session::get('last_page'));
+        }
+        catch (HTTPException $exception)
+        {
+            $this->db->rollBack();
+            Session::set('http_exception_code', $exception->getCode());
+            Redirect::to('/error');
         }
         catch (UserException $exception)
         {
