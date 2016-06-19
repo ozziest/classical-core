@@ -122,22 +122,9 @@ class Bootstrap {
             $this->db->rollBack();
         }
 
-        if ($status === 0)
-        {
-            $status = 400;
-        }
-
         $this->failOnProduction($exception);
 
-        if ($message === null)
-        {
-            $message = $exception->getMessage();
-        }
-
-        $this->logger->exception($exception);
-
-        Session::set('validation_errors', [$message]);
-        Redirect::to(Session::get('last_page'));
+        return $this->response->view('errors.'.$status);
 
     }
 
