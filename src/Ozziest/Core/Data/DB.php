@@ -90,4 +90,16 @@ class DB implements IDB {
         return $this->get()->select($this->get()->raw($sql), $arguments);
     }    
 
+    /**
+     * This method runs a raw query such as update or delete
+     * 
+     * @param  string   $sql
+     * @param  array    $arguments
+     * @return mixed
+     */
+    public function execute($sql, $arguments = array())
+    {
+        $this->get()->statement($sql, $arguments);
+    }    
+
 }

@@ -59,25 +59,21 @@ class Bootstrap {
         }
         catch (ModelNotFoundException $exception)
         {
-            $this->db->rollBack();
             Session::set('validation_errors', ["Record not found!"]);
             Redirect::to(Session::get('last_page'));
         }
         catch (ValidationException $exception)
         {
-            $this->db->rollBack();
             Session::set(Windrider::getPrefix().'validation_errors', Windrider::getErrors());
             Redirect::to(Session::get('last_page'));
         }
         catch (HTTPException $exception)
         {
-            $this->db->rollBack();
             Session::set('http_exception_code', $exception->getCode());
             Redirect::to('/error');
         }
         catch (UserException $exception)
         {
-            $this->db->rollBack();
             Session::set('validation_errors', [$exception->getMessage()]);
             Redirect::to(Session::get('last_page'));
         }
@@ -116,11 +112,6 @@ class Bootstrap {
      */
     private function showError($exception, $status = 500, $message = null)
     {
-
-        if ($this->db !== null)
-        {
-            $this->db->rollBack();
-        }
 
         $this->failOnProduction($exception);
 
@@ -251,9 +242,7 @@ class Bootstrap {
         ];
 
         // Controller çağrılır
-        $this->db->transaction();
         $content = call_user_func_array([$controller, $parameters['method']], $arguments);
-        $this->db->commit();
     }
 
     /**
