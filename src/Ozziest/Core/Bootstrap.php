@@ -152,7 +152,23 @@ class Bootstrap {
     private function initErrorHandler()
     {
         $whoops = new \Whoops\Run();
-        $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
+        if (getenv('environment') === 'production')
+        {
+            $whoops->pushHandler(function($exception, $inspector, $run) {
+                $this->logger->error(
+                    $exception->getMessage(),
+                    $exception->getFile(),
+                    $exception->getLine()
+                );
+                Session::set('http_exception_code', 500);
+                Redirect::to('/error');
+                return Handler::DONE;
+            });        
+        }
+        else 
+        {
+            $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());            
+        }
         $whoops->register();
     }
 

@@ -27,9 +27,9 @@ class Logger implements ILogger {
      * @param  string       $message
      * @return null
      */
-    public function error($message)
+    public function error($message, $file = '', $line = '0')
     {
-        $this->logger->addError($message);        
+        $this->logger->addError($message.', '.$file.' [Line: '.$line.']');        
     }
 
     /**
