@@ -9,6 +9,11 @@ class Redirect {
         self::$db = $db;
     }
 
+    public static function toDomain($route)
+    {
+        header("Location: ".$route);
+    }
+
     public static function to($route, $args = null)
     {
         if (substr($route, 0, 1) === "/")
@@ -25,7 +30,6 @@ class Redirect {
             }
         }
 
-        self::$db->commit();
         header("Location: /".$route);
         die();
     }

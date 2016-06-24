@@ -15,7 +15,7 @@ use Ozziest\Windrider\ValidationException;
 use Ozziest\Windrider\Windrider;
 use Ozziest\Core\Exceptions\UserException;
 use Ozziest\Core\Exceptions\HTTPException;
-use Exception, Router, Session, Form, Redirect;
+use Exception, Router, Session, Form, Redirect, Lang;
 use Ozziest\Core\HTTP\Response;
 use Ozziest\Core\HTTP\Request;
 use Ozziest\Core\Data\DB;
@@ -42,6 +42,7 @@ class Bootstrap {
             class_alias('\Ozziest\Core\Data\Session', 'Session');
             class_alias('\Ozziest\Core\Data\Form', 'Form');
             class_alias('\Ozziest\Core\Data\Redirect', 'Redirect');
+            class_alias('\Ozziest\Core\Data\Lang', 'Lang');
             $this->initLogger();
             $this->initSetups();
             $this->initConfigurations();
@@ -211,6 +212,19 @@ class Bootstrap {
     private function initRequest()
     {
         $this->request = SymfonyRequest::createFromGlobals();
+        
+        // Dil tanımlaları kontrol ediliyor
+        $domain = str_replace(['http://', 'https://'], '', getenv('domain'));
+        $domainParts = explode('.', $this->request->getHttpHost());
+        $subdomains = ['en', 'tr', 'beta'];
+        if (in_array($domainParts[0], $subdomains) === false)
+        {
+            $domainParts[0] = 'tr';
+            $url = 'http://tr.'.$domain;
+            Redirect::toDomain($url);
+        }
+        Lang::set($domainParts[0]);
+        
         $context = new RequestContext();
         $context->fromRequest($this->request);
         $this->matcher = new UrlMatcher(Router::getCollection(), $context);
