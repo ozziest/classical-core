@@ -44,7 +44,7 @@ class Session {
 
     public static function isAdmin()
     {
-        return self::get('the_user_authority') === 'admin';
+        return self::get('the_user_authority') == 'admin';
     }
 
     public static function clearUser()

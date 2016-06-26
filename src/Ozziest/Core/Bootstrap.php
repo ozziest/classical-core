@@ -113,9 +113,8 @@ class Bootstrap {
      */
     private function showError($exception, $status = 500, $message = null)
     {
-
+        
         $this->failOnProduction($exception);
-
         return $this->response->view('errors.'.$status);
 
     }
@@ -132,6 +131,12 @@ class Bootstrap {
         if (getenv('environment') !== "production") {
             throw $exception;
         }
+        
+        $this->logger->error(
+            $exception->getMessage(),
+            $exception->getFile(),
+            $exception->getLine()
+        );
     }
 
     /**
