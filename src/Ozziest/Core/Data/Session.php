@@ -13,6 +13,7 @@ class Session {
         self::set('the_user_email', $user->email);
         self::set('the_user_name', $user->first_name.' '.$user->last_name);
         self::set('the_user_slug', $user->slug);
+        self::set('the_user_authority', $user->authority);
         self::set('is_logged', true);
     }
 
@@ -34,6 +35,16 @@ class Session {
     public static function slug()
     {
         return self::get('the_user_slug');
+    }
+
+    public static function authority()
+    {
+        return self::get('the_user_authority');
+    }
+
+    public static function isAdmin()
+    {
+        return self::get('the_user_authority') === 'admin';
     }
 
     public static function clearUser()
