@@ -43,6 +43,7 @@ class Bootstrap {
             class_alias('\Ozziest\Core\Data\Form', 'Form');
             class_alias('\Ozziest\Core\Data\Redirect', 'Redirect');
             class_alias('\Ozziest\Core\Data\Lang', 'Lang');
+            class_alias('\Ozziest\Core\Helpers\DateHelper', 'Dater');
             $this->initLogger();
             $this->initSetups();
             $this->initConfigurations();
