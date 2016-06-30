@@ -1,6 +1,6 @@
 <?php namespace Ozziest\Core\Helpers;
 
-use DateTime, DateInterval;
+use DateTime, DateInterval, Lang;
 
 class DateHelper {
 
@@ -31,7 +31,7 @@ class DateHelper {
 
         if ($etime < 1)
         {
-            return '0 seconds';
+            return '0 '.Lang::get('seconds');
         }
 
         $a = array( 365 * 24 * 60 * 60  =>  'year',
@@ -55,7 +55,7 @@ class DateHelper {
             if ($d >= 1)
             {
                 $r = round($d);
-                return $r . ' ' . ($r > 1 ? $a_plural[$str] : $str) . ' ago';
+                return $r . ' ' . ($r > 1 ? Lang::get($a_plural[$str]) : Lang::get($str)) . ' '.Lang::get('ago');
             }
         }
     }
