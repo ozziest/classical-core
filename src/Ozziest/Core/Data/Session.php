@@ -13,6 +13,7 @@ class Session {
         self::set('the_user_email', $user->email);
         self::set('the_user_name', $user->first_name.' '.$user->last_name);
         self::set('the_user_slug', $user->slug);
+        self::set('the_user_avatar', $user->avatar);
         self::set('the_user_authority', $user->authority);
         self::set('is_logged', true);
     }
@@ -40,6 +41,11 @@ class Session {
     public static function authority()
     {
         return self::get('the_user_authority');
+    }
+
+    public static function avatar()
+    {
+        return '/avatars/'.self::get('the_user_avatar');
     }
 
     public static function isAdmin()
