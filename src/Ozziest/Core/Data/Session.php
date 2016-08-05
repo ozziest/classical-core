@@ -15,6 +15,7 @@ class Session {
         self::set('the_user_slug', $user->slug);
         self::set('the_user_avatar', $user->avatar);
         self::set('the_user_authority', $user->authority);
+        self::set('the_user_confirmation', $user->confirmation_code);
         self::set('is_logged', true);
     }
 
@@ -51,6 +52,11 @@ class Session {
     public static function isAdmin()
     {
         return self::get('the_user_authority') == 'admin';
+    }
+
+    public static function isConfirmed()
+    {
+        return strlen(self::get('the_user_confirmation')) == 0;
     }
 
     public static function clearUser()
