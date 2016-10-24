@@ -218,8 +218,10 @@ class Bootstrap {
     private function initRequest()
     {
         $this->request = SymfonyRequest::createFromGlobals();
-        
+        define('CURRENT_PATH', $this->request->getPathInfo());
+
         // Dil tanımlaları kontrol ediliyor
+        /*
         $domain = str_replace(['http://', 'https://'], '', getenv('domain'));
         $domainParts = explode('.', $this->request->getHttpHost());
         $subdomains = ['en', 'tr', 'beta'];
@@ -230,6 +232,9 @@ class Bootstrap {
             Redirect::toDomain($url);
         }
         Lang::set($domainParts[0]);
+        */
+        
+        Lang::set('tr');
         
         $context = new RequestContext();
         $context->fromRequest($this->request);
